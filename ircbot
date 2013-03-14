@@ -1,0 +1,78 @@
+#! /usr/bin/env python
+
+import irc.bot
+import irc.strings
+from irc.client import ip_numstr_to_quad, ip_quad_to_numstr
+
+from multiprocessing import Process, Queue
+import SocketServer
+
+class IRCBot(irc.bot.SingleServerIRCBot):
+    def __init__(self, channel, nickname, server, port, queue):
+        irc.bot.SingleServerIRCBot.__init__(self, [(server, port)], nickname, nickname)
+        self.channel = channel
+        self.queue = queue
+
+    def on_welcome(self, c, e):
+        c.join(self.channel)
+        while 1:
+            print "Waiting on queue"
+            text = self.queue.get()
+            print "Got \"%s\" from queue" % text
+            c.privmsg(self.channel, text)
+
+class ListenServer(SocketServer.TCPServer):
+    def __init__(self, server_address, RequestHandlerClass, queue):
+        self.queue = queue
+        SocketServer.TCPServer.__init__(
+                self, server_address, RequestHandlerClass
+                )
+
+class ConnectionHandler(SocketServer.BaseRequestHandler):
+    def handle(self):
+        print "Connection receieved from %s" % self.client_address[0]
+        data = self.request.recv(1024).strip()
+        print "Receieved: %s" % data
+        self.server.queue.put(data)
+
+def listen_input(address, port, queue):
+    server = ListenServer((address, port), ConnectionHandler, queue)
+    server.serve_forever()
+
+def main():
+    import sys
+    if len(sys.argv) != 5:
+        print "Usage: testbot <bindaddress:port> <ircserver[:port]> <channel> <nickname>"
+        sys.exit(1)
+
+    bindaddr, bindport = sys.argv[1].split(":", 1)
+    bindport = int(bindport)
+
+    s = sys.argv[2].split(":", 1)
+    server = s[0]
+    if len(s) == 2:
+        try:
+            port = int(s[1])
+        except ValueError:
+            print "Error: Erroneous port."
+            sys.exit(1)
+    else:
+        port = 6667
+    channel = sys.argv[3]
+    nickname = sys.argv[4]
+
+    queue = Queue()
+
+    p = Process(target=listen_input, args=(bindaddr, bindport, queue,))
+    p.start()
+
+    bot = IRCBot(channel, nickname, server, port, queue)
+    
+    try:
+        bot.start()
+    except KeyboardInterrupt, e:
+        bot.die()
+        p.terminate()
+
+if __name__ == "__main__":
+    main()
