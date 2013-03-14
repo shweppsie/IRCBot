@@ -12,6 +12,9 @@ If you have pip installed then installing the irc library is as easy as:
 
 `pip install irc`
 
+Note: If this fails you may need to install hgtools
+`pip install hgtools`
+
 Operation
 ---------
 
