@@ -15,14 +15,14 @@ If you have pip installed then installing the irc library is as easy as:
 Operation
 ---------
 
-  * Running the bot is as follows.
+  * Running the bot is as follows
 
 `ircbot <bindaddress:port> <ircserver[:port]> <channel> <nickname>`
 
-  * When using bash remember to escape # symbols.
+  * When using bash remember to escape # symbols
 
 `ircbot 127.0.0.1:4567 irc.shweppsie.com \#test testing`
 
-  * With the above code you can do the follow to post messages to the channel
+  * With the above command you can do the following to post messages to the channel
 
 `echo "Hi" | telnet 127.0.0.1:4567`
