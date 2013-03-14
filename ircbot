@@ -42,7 +42,8 @@ def listen_input(address, port, queue):
 def main():
     import sys
     if len(sys.argv) != 5:
-        print "Usage: testbot <bindaddress:port> <ircserver[:port]> <channel> <nickname>"
+        print "Usage: %s <bindaddress:port> <ircserver[:port]> " \
+            "<channel> <nickname>" % sys.argv[0]
         sys.exit(1)
 
     bindaddr, bindport = sys.argv[1].split(":", 1)
