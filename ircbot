@@ -9,7 +9,8 @@ import Queue, SocketServer, time
 
 class IRCBot(irc.bot.SingleServerIRCBot):
     def __init__(self, channel, nickname, server, port, queue):
-        irc.bot.SingleServerIRCBot.__init__(self, [(server, port)], nickname, nickname)
+        irc.bot.SingleServerIRCBot.__init__( \
+                self, [(server, port)], nickname, nickname)
         self.channel = channel
         self.queue = queue
 
