@@ -75,8 +75,13 @@ def main():
     p = mp.Process(target=listen_input, args=(bindaddr, bindport, queue,))
     p.start()
 
+    # Wait a second and if the process has died something went wrong.
+    time.sleep(1)
+    if not p.is_alive():
+        exit(1)
+
     bot = IRCBot(channel, nickname, server, port, queue)
-    
+
     try:
         bot.start()
     except KeyboardInterrupt, e:
