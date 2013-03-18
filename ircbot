@@ -18,6 +18,9 @@ class IRCBot(irc.bot.SingleServerIRCBot):
         c.join(self.channel)
         c.execute_every(1, self.print_text, (c,))
 
+    def on_disconnect(self, c, e):
+        c.reconnect
+
     def print_text(self, c):
         try:
             text = self.queue.get(False)
