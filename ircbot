@@ -15,11 +15,15 @@ class IRCBot(irc.bot.SingleServerIRCBot):
 
     def on_welcome(self, c, e):
         c.join(self.channel)
-        while 1:
-            print "Waiting on queue"
-            text = self.queue.get()
+        c.execute_every(1, self.print_text, (c,))
+
+    def print_text(self, c):
+        try:
+            text = self.queue.get(False)
             print "Got \"%s\" from queue" % text
             c.privmsg(self.channel, text)
+        except Queue.Empty, e:
+            pass
 
 class ListenServer(SocketServer.TCPServer):
     def __init__(self, server_address, RequestHandlerClass, queue):
