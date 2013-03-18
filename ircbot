@@ -4,8 +4,8 @@ import irc.bot
 import irc.strings
 from irc.client import ip_numstr_to_quad, ip_quad_to_numstr
 
-from multiprocessing import Process, Queue
-import SocketServer
+import multiprocessing as mp
+import Queue, SocketServer, time
 
 class IRCBot(irc.bot.SingleServerIRCBot):
     def __init__(self, channel, nickname, server, port, queue):
@@ -62,9 +62,9 @@ def main():
     channel = sys.argv[3]
     nickname = sys.argv[4]
 
-    queue = Queue()
+    queue = mp.Queue()
 
-    p = Process(target=listen_input, args=(bindaddr, bindport, queue,))
+    p = mp.Process(target=listen_input, args=(bindaddr, bindport, queue,))
     p.start()
 
     bot = IRCBot(channel, nickname, server, port, queue)
